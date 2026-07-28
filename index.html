@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Perception Scorecard™ — Brenda Blanche</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#070a12;
+  --secondary:#f3ede2;
+  --accent1:#ff2d2d;
+  --accent2:#b6ff2e;
+  --muted:#5a5f6e;
+  --surface:rgba(243,237,226,0.03);
+  --border:rgba(243,237,226,0.07);
+  --border-strong:rgba(243,237,226,0.12);
+  --serif:'Playfair Display',Georgia,serif;
+  --sans:'Inter',system-ui,sans-serif;
+  --mono:'Space Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--primary);color:var(--secondary);
+  font-family:var(--sans);font-weight:300;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;min-height:100vh;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9999;opacity:.4;
+}
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(243,237,226,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(243,237,226,0.025) 1px,transparent 1px);
+  background-size:80px 80px;
+  pointer-events:none;z-index:0;
+}
+.spine{
+  position:fixed;top:0;left:0;width:4px;height:100%;
+  background:var(--accent1);z-index:200;
+}
+.screen{display:none;flex-direction:column;min-height:100vh;padding-left:4px}
+.screen.active{display:flex}
+
+/* ── COVER ── */
+.cover-nav{
+  padding:24px 56px;display:flex;
+  justify-content:space-between;align-items:center;
+  position:relative;z-index:2;
+}
+.cover-brand{
+  font-family:var(--mono);font-size:.52rem;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--accent1);
+}
+.cover-tag{
+  font-family:var(--mono);font-size:.48rem;
+  letter-spacing:.16em;text-transform:uppercase;
+  border:1px solid rgba(182,255,46,0.3);
+  padding:6px 16px;color:var(--accent1);
+}
+.cover-body{
+  flex:1;display:flex;flex-direction:column;
+  justify-content:center;
+  padding:2rem 56px 3rem;
+  position:relative;z-index:2;
+  max-width:1000px;
+}
+.cover-line-v{
+  position:fixed;top:0;right:220px;width:1px;height:100%;
+  background:linear-gradient(180deg,transparent,rgba(182,255,46,0.12),transparent);
+  pointer-events:none;
+}
+.cover-line-v2{
+  position:fixed;top:0;left:280px;width:1px;height:100%;
+  background:linear-gradient(180deg,transparent,rgba(255,45,45,0.08),transparent);
+  pointer-events:none;
+}
+.cover-eyebrow{
+  font-family:var(--mono);font-size:.5rem;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:var(--accent1);
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:32px;
+}
+.cover-eyebrow::before{content:'';width:32px;height:1px;background:var(--accent1)}
+.cover-headline{
+  font-family:var(--serif);font-weight:900;
+  font-size:clamp(2.8rem,6vw,6rem);
+  line-height:.93;letter-spacing:-.03em;
+  color:var(--secondary);margin-bottom:28px;
+}
+.cover-headline em{
+  font-style:italic;
+  color:var(--accent1);
+}
+.cover-headline .red{color:var(--accent1)}
+.cover-sub{
+  font-family:var(--serif);font-size:clamp(.95rem,1.7vw,1.2rem);
+  font-style:italic;font-weight:400;
+  color:rgba(243,237,226,0.55);
+  max-width:580px;line-height:1.7;margin-bottom:40px;
+}
+.cover-rule{
+  width:72px;height:2px;
+  background:linear-gradient(90deg,var(--accent2),var(--accent1),transparent);
+  margin-bottom:32px;
+}
+.cover-offer{
+  background:rgba(243,237,226,0.03);
+  border:1px solid var(--border-strong);
+  border-left:3px solid var(--accent1);
+  padding:28px 32px;max-width:580px;margin-bottom:36px;
+}
+.cover-offer-label{
+  font-family:var(--mono);font-size:.46rem;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent1);margin-bottom:14px;display:block;
+}
+.cover-offer-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.cover-offer-list li{
+  font-size:.87rem;line-height:1.6;
+  color:rgba(243,237,226,0.65);
+  display:flex;gap:12px;align-items:flex-start;
+}
+.cover-offer-list li::before{
+  content:'→';color:var(--accent1);
+  flex-shrink:0;font-size:.75rem;margin-top:3px;
+}
+.cover-honest{
+  font-family:var(--mono);font-size:.5rem;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(243,237,226,0.2);
+  margin-bottom:36px;max-width:460px;line-height:1.9;
+}
+.cover-honest span{color:var(--accent1)}
+.btn-start{
+  display:inline-flex;align-items:center;gap:16px;
+  background:var(--accent1);color:var(--primary);
+  font-family:var(--mono);font-size:.6rem;
+  font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  padding:18px 40px;border:none;cursor:pointer;
+  transition:opacity .18s,transform .18s;
+}
+.btn-start:hover{opacity:.88;transform:translateY(-2px)}
+.btn-start .arr{transition:transform .2s}
+.btn-start:hover .arr{transform:translateX(5px)}
+.cover-footer{
+  padding:20px 56px;display:flex;gap:40px;
+  border-top:1px solid var(--border);flex-wrap:wrap;
+  position:relative;z-index:2;
+}
+.cf-meta{
+  font-family:var(--mono);font-size:.46rem;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(243,237,226,0.18);
+}
+.cf-meta span{color:rgba(182,255,46,0.45)}
+
+/* ── TRANSITION ── */
+.pt-wrap{
+  flex:1;display:flex;flex-direction:column;
+  justify-content:center;padding:4rem 56px;
+  animation:fadeIn .4s ease;position:relative;overflow:hidden;
+}
+.pt-bg-num{
+  position:absolute;right:-.05em;bottom:-.1em;
+  font-family:var(--serif);font-weight:900;
+  font-size:30vw;line-height:1;
+  color:rgba(243,237,226,0.018);
+  pointer-events:none;user-select:none;letter-spacing:-.05em;
+}
+.pt-eyebrow{
+  font-family:var(--mono);font-size:.5rem;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(243,237,226,0.3);margin-bottom:1.2rem;
+}
+.pt-bar{
+  width:48px;height:2px;
+  background:linear-gradient(90deg,var(--accent2),var(--accent1));
+  margin-bottom:2rem;
+}
+.pt-heading{
+  font-family:var(--serif);font-weight:900;
+  font-size:clamp(2.5rem,6vw,5rem);
+  color:var(--secondary);margin-bottom:1rem;
+  line-height:1.0;letter-spacing:-.025em;
+}
+.pt-heading span{color:var(--accent1);font-style:italic}
+.pt-body{
+  font-size:.9rem;line-height:1.85;
+  color:rgba(243,237,226,0.4);
+  max-width:520px;margin-bottom:3rem;
+}
+.btn-continue{
+  display:inline-flex;align-items:center;gap:14px;
+  background:transparent;
+  border:1px solid var(--accent1);
+  color:var(--accent1);
+  font-family:var(--mono);font-size:.58rem;
+  letter-spacing:.16em;text-transform:uppercase;
+  font-weight:700;padding:15px 32px;
+  cursor:pointer;transition:all .18s;
+}
+.btn-continue:hover{background:var(--accent1);color:var(--primary)}
+
+/* ── QUIZ ── */
+.quiz-top{
+  padding:20px 56px 0;
+  display:flex;justify-content:space-between;align-items:center;
+  position:relative;z-index:2;
+}
+.pillar-wrap{
+  font-family:var(--mono);font-size:.58rem;
+  letter-spacing:.16em;text-transform:uppercase;
+}
+.pillar-name{color:var(--accent1)}
+.pillar-sub{color:rgba(243,237,226,0.25);margin-left:6px}
+.progress-wrap{display:flex;align-items:center;gap:16px}
+.progress-track{
+  width:180px;height:1px;
+  background:rgba(243,237,226,0.07);overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--accent2),var(--accent1));
+  transition:width .5s ease;width:0%;
+}
+.q-counter{
+  font-family:var(--mono);font-size:.5rem;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(243,237,226,0.2);white-space:nowrap;
+}
+.quiz-body{
+  flex:1;display:flex;flex-direction:column;
+  justify-content:center;
+  padding:2rem 56px 1.5rem;max-width:780px;
+  position:relative;z-index:2;
+}
+.q-num{
+  font-family:var(--mono);font-size:.5rem;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(243,237,226,0.18);margin-bottom:1.4rem;
+}
+.q-text{
+  font-family:var(--serif);font-weight:700;
+  font-size:clamp(1.25rem,2.4vw,1.8rem);
+  line-height:1.3;color:var(--secondary);
+  margin-bottom:2.5rem;letter-spacing:-.01em;
+}
+.answer-grid{display:flex;flex-direction:column}
+.answer-btn{
+  display:flex;align-items:flex-start;gap:16px;
+  background:transparent;border:none;
+  border-top:1px solid var(--border);
+  padding:16px 0;cursor:pointer;text-align:left;
+  color:var(--secondary);font-family:var(--sans);
+  transition:all .18s ease;position:relative;
+}
+.answer-btn:last-child{border-bottom:1px solid var(--border)}
+.answer-btn::before{
+  content:'';position:absolute;left:-56px;top:0;bottom:0;
+  width:0;background:rgba(182,255,46,0.04);
+  transition:width .25s ease;
+}
+.answer-btn:hover::before{width:calc(100% + 112px)}
+.answer-btn:hover{padding-left:8px}
+.answer-btn:hover .a-dot{border-color:var(--accent1)}
+.answer-btn.selected{padding-left:8px}
+.answer-btn.selected .a-dot{
+  background:var(--accent1);border-color:var(--accent1);
+  box-shadow:0 0 12px rgba(182,255,46,0.4);
+}
+.answer-btn.selected .a-letter{color:var(--accent1)}
+.answer-btn.selected .a-label{color:var(--secondary)}
+.a-dot{
+  width:10px;height:10px;border-radius:50%;
+  border:1px solid rgba(243,237,226,0.2);
+  flex-shrink:0;margin-top:5px;
+  transition:all .18s ease;position:relative;z-index:1;
+}
+.a-letter{
+  font-family:var(--mono);font-size:.48rem;
+  letter-spacing:.1em;color:rgba(243,237,226,0.18);
+  flex-shrink:0;margin-top:5px;width:12px;
+  position:relative;z-index:1;transition:color .18s;
+}
+.a-label{
+  font-size:.87rem;font-weight:300;
+  color:rgba(243,237,226,0.4);line-height:1.55;
+  transition:color .18s;position:relative;z-index:1;
+}
+.quiz-nav{
+  padding:18px 56px;
+  display:flex;justify-content:space-between;align-items:center;
+  border-top:1px solid var(--border);
+  position:relative;z-index:2;
+}
+.btn-back{
+  background:transparent;
+  border:1px solid rgba(243,237,226,0.12);
+  color:rgba(243,237,226,0.3);
+  font-family:var(--mono);font-size:.56rem;
+  letter-spacing:.14em;text-transform:uppercase;
+  padding:11px 22px;cursor:pointer;transition:all .18s;
+}
+.btn-back:hover{border-color:var(--border-strong);color:var(--secondary)}
+.btn-back:disabled{opacity:.15;cursor:default}
+.btn-next{
+  background:transparent;
+  border:1px solid var(--accent1);
+  color:var(--accent1);
+  font-family:var(--mono);font-size:.56rem;
+  letter-spacing:.14em;text-transform:uppercase;
+  padding:11px 26px;cursor:pointer;transition:all .18s;
+}
+.btn-next:hover:not(:disabled){background:var(--accent1);color:var(--secondary)}
+.btn-next:disabled{
+  opacity:.18;cursor:default;
+  border-color:rgba(243,237,226,0.12);
+  color:rgba(243,237,226,0.18);
+}
+
+/* ── GATE ── */
+#screen-gate{flex-direction:row;min-height:100vh;animation:fadeIn .6s ease}
+.gate-left{
+  flex:0 0 44%;display:flex;flex-direction:column;
+  justify-content:space-between;
+  padding:3rem 3rem 3rem 3.5rem;
+  background:rgba(0,0,0,0.3);
+  position:relative;overflow:hidden;
+}
+.gate-left::before{
+  content:'';position:absolute;bottom:-80px;right:-80px;
+  width:400px;height:400px;
+  background:radial-gradient(ellipse,rgba(182,255,46,0.08) 0%,transparent 65%);
+  pointer-events:none;
+}
+.gate-stripe{
+  position:absolute;top:0;right:0;bottom:0;width:1px;
+  background:linear-gradient(180deg,transparent,rgba(182,255,46,0.2) 40%,rgba(255,45,45,0.3) 70%,transparent);
+}
+.gate-brand{
+  font-family:var(--mono);font-size:.5rem;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent1);margin-bottom:3.5rem;
+}
+.gate-eyebrow{
+  font-family:var(--mono);font-size:.48rem;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(243,237,226,0.3);
+  display:flex;align-items:center;gap:10px;margin-bottom:1.2rem;
+}
+.gate-eyebrow::before{content:'';width:20px;height:1px;background:var(--accent1)}
+.gate-heading{
+  font-family:var(--serif);font-weight:900;
+  font-size:clamp(1.8rem,3.5vw,2.8rem);
+  line-height:1.0;letter-spacing:-.025em;
+  color:var(--secondary);margin-bottom:1.6rem;
+}
+.gate-heading em{font-style:italic;color:var(--accent1)}
+.gate-rule{
+  width:40px;height:2px;
+  background:linear-gradient(90deg,var(--accent2),var(--accent1));
+  margin-bottom:1.6rem;
+}
+.gate-desc{
+  font-size:.84rem;line-height:1.9;
+  color:rgba(243,237,226,0.38);max-width:300px;
+}
+.gate-includes{display:flex;flex-direction:column;gap:9px;position:relative;z-index:1}
+.gate-includes-label{
+  font-family:var(--mono);font-size:.44rem;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(243,237,226,0.22);margin-bottom:4px;
+}
+.gate-inc-item{display:flex;align-items:flex-start;gap:10px}
+.gate-inc-arr{color:var(--accent1);font-size:.7rem;flex-shrink:0;margin-top:3px}
+.gate-inc-txt{font-size:.77rem;color:rgba(243,237,226,0.38);line-height:1.5}
+.gate-right{
+  flex:1;display:flex;flex-direction:column;
+  justify-content:center;
+  padding:4rem 4rem 3rem 4.5rem;
+  position:relative;z-index:1;
+}
+.gate-form-ey{
+  font-family:var(--mono);font-size:.48rem;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent1);
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:1.8rem;animation:fadeUp .5s ease both .15s;
+}
+.gate-form-ey::before{content:'';width:20px;height:1px;background:var(--accent1)}
+.gate-form-title{
+  font-family:var(--serif);font-weight:900;
+  font-size:clamp(1.5rem,2.8vw,2.2rem);
+  line-height:1.1;letter-spacing:-.02em;
+  color:var(--secondary);margin-bottom:.6rem;
+  animation:fadeUp .5s ease both .2s;
+}
+.gate-form-title em{font-style:italic;color:var(--accent1)}
+.gate-form-sub{
+  font-size:.82rem;line-height:1.85;
+  color:rgba(243,237,226,0.35);
+  margin-bottom:2.4rem;max-width:340px;
+  animation:fadeUp .5s ease both .25s;
+}
+.field-wrap{position:relative;margin-bottom:1.6rem}
+.field-wrap input{
+  width:100%;
+  background:rgba(243,237,226,0.03);
+  border:1px solid var(--border-strong);
+  border-radius:0;outline:none;
+  color:var(--secondary);font-family:var(--sans);
+  font-size:1rem;font-weight:300;
+  padding:20px 18px 10px;
+  transition:border-color .25s,background .25s;
+  caret-color:var(--accent1);
+}
+.field-wrap input::placeholder{color:transparent}
+.field-wrap input:focus{
+  border-color:rgba(182,255,46,0.4);
+  background:rgba(243,237,226,0.05);
+}
+.field-wrap input:not(:placeholder-shown),
+.field-wrap input:focus{padding:24px 18px 8px}
+.field-label{
+  position:absolute;left:18px;top:50%;
+  transform:translateY(-50%);
+  font-family:var(--mono);font-size:.56rem;
+  letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(243,237,226,0.28);
+  pointer-events:none;transition:all .22s;transform-origin:left;
+}
+.field-wrap input:focus ~ .field-label,
+.field-wrap input:not(:placeholder-shown) ~ .field-label{
+  top:14px;transform:translateY(0) scale(.8);
+  color:var(--accent1);letter-spacing:.2em;
+}
+.field-acc{
+  position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent2),var(--accent1));
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .3s;
+}
+.field-wrap:focus-within .field-acc{transform:scaleX(1)}
+.gate-error{
+  font-family:var(--mono);font-size:.54rem;
+  color:var(--accent1);margin-bottom:.8rem;
+  display:none;letter-spacing:.1em;text-transform:uppercase;
+  padding:10px 14px;
+  border-left:2px solid var(--accent1);
+  background:rgba(255,45,45,0.06);
+}
+.gate-submit{
+  display:flex;align-items:center;
+  justify-content:space-between;gap:12px;
+  background:var(--accent1);color:var(--primary);
+  font-family:var(--mono);font-size:.6rem;
+  font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  padding:18px 28px;border:none;cursor:pointer;
+  transition:all .2s;width:100%;margin-bottom:12px;
+}
+.gate-submit:hover:not(:disabled){
+  opacity:.88;transform:translateY(-2px);
+  box-shadow:0 8px 32px rgba(182,255,46,0.2);
+}
+.gate-submit:disabled{opacity:.3;cursor:not-allowed;transform:none}
+.gate-privacy{
+  font-family:var(--mono);font-size:.44rem;
+  color:rgba(243,237,226,0.16);
+  letter-spacing:.12em;text-transform:uppercase;
+  display:flex;align-items:center;gap:7px;
+}
+.gate-privacy::before{content:'⊛';font-size:.6rem;opacity:.4}
+.gate-spinner{
+  display:none;width:12px;height:12px;
+  border:2px solid rgba(7,10,18,.3);
+  border-top-color:var(--primary);
+  border-radius:50%;animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── RESULTS ── */
+#screen-results{animation:fadeIn .5s ease}
+.results-header{
+  padding:2rem 56px 1.8rem;
+  border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;
+  align-items:flex-end;flex-wrap:wrap;gap:1.5rem;
+}
+.results-brand{
+  font-family:var(--mono);font-size:.48rem;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:1rem;
+}
+.stage-badge{
+  display:inline-block;
+  background:var(--accent1);color:var(--secondary);
+  font-family:var(--mono);font-size:.56rem;
+  letter-spacing:.18em;text-transform:uppercase;
+  font-weight:700;padding:8px 20px;
+}
+.zone-wrap{text-align:right}
+.zone-label{
+  font-family:var(--mono);font-size:.46rem;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);display:block;margin-bottom:.4rem;
+}
+.zone-val{
+  font-family:var(--serif);font-style:italic;
+  font-size:1.1rem;color:var(--accent1);
+}
+.results-grid{
+  padding:2.5rem 56px 3.5rem;
+  display:grid;grid-template-columns:1.15fr 1fr;
+  gap:3.5rem;align-items:start;
+}
+/* LEFT */
+.scores-eyebrow{
+  font-family:var(--mono);font-size:.46rem;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:1rem;
+}
+.score-row{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:18px;
+}
+.score-row.gap .score-name{color:var(--secondary)}
+.score-row.gap .score-fill{
+  background:linear-gradient(90deg,var(--accent1),var(--accent2));
+}
+.score-row.gap .score-val{color:var(--accent1)}
+.score-name{
+  font-family:var(--mono);font-size:.52rem;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(243,237,226,0.28);min-width:80px;
+}
+.score-track{flex:1;height:1px;background:rgba(243,237,226,0.06)}
+.score-fill{
+  height:100%;background:rgba(243,237,226,0.15);
+  transition:width 1.1s ease;width:0%;
+}
+.score-val{
+  font-family:var(--mono);font-size:.58rem;
+  color:rgba(243,237,226,0.2);min-width:42px;text-align:right;
+}
+.gap-tag{
+  font-family:var(--mono);font-size:.46rem;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent1);white-space:nowrap;
+  opacity:0;transition:opacity .5s .95s;
+}
+.gap-tag.show{opacity:1}
+.r-headline{
+  font-family:var(--serif);font-weight:900;
+  font-size:clamp(1.5rem,2.8vw,2.2rem);
+  line-height:1.1;letter-spacing:-.02em;
+  color:var(--secondary);margin-bottom:1rem;
+}
+.r-headline em{font-style:italic;color:var(--accent1)}
+.r-verdict{
+  font-size:.9rem;line-height:1.9;
+  color:rgba(243,237,226,0.5);margin-bottom:1.8rem;
+}
+.bottleneck-block{
+  border-top:1px solid var(--border);
+  padding-top:1.6rem;margin-bottom:1.8rem;
+}
+.bottleneck-label{
+  font-family:var(--mono);font-size:.48rem;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(255,45,45,0.7);margin-bottom:.8rem;
+}
+.bottleneck-body{
+  font-size:.87rem;line-height:1.85;
+  color:rgba(243,237,226,0.45);margin-bottom:1.2rem;
+}
+.signals-list{list-style:none;display:flex;flex-direction:column;gap:9px}
+.signals-list li{
+  font-size:.84rem;line-height:1.65;
+  color:rgba(243,237,226,0.38);
+  padding-left:18px;position:relative;
+}
+.signals-list li::before{
+  content:'→';position:absolute;left:0;
+  color:var(--accent1);font-size:.68rem;top:2px;
+}
+.moves-block{
+  border-top:1px solid var(--border);
+  padding-top:1.6rem;margin-bottom:1.8rem;
+}
+.moves-label{
+  font-family:var(--mono);font-size:.48rem;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--accent1);margin-bottom:.8rem;
+}
+.moves-list{list-style:none;display:flex;flex-direction:column;gap:12px}
+.moves-list li{
+  font-size:.84rem;line-height:1.75;
+  color:rgba(243,237,226,0.48);
+  display:flex;gap:14px;
+}
+.move-num{
+  font-family:var(--mono);font-size:.52rem;
+  color:var(--accent1);font-weight:700;
+  margin-top:3px;flex-shrink:0;
+}
+/* CTAs */
+.results-ctas{
+  display:flex;flex-direction:column;gap:10px;
+  margin-top:1.8rem;padding-top:1.8rem;
+  border-top:1px solid var(--border);
+}
+.cta-eyebrow{
+  font-family:var(--mono);font-size:.46rem;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:5px;
+}
+.btn-cta-primary{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--accent1);color:var(--primary);
+  font-family:var(--mono);font-size:.58rem;
+  font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  padding:17px 22px;border:none;cursor:default;
+}
+.btn-cta-primary-sub{
+  font-size:.74rem;color:rgba(243,237,226,0.4);
+  margin-top:5px;line-height:1.5;
+}
+.btn-cta-secondary{
+  display:flex;align-items:center;justify-content:space-between;
+  background:transparent;
+  border:1px solid rgba(243,237,226,0.18);
+  color:var(--secondary);
+  font-family:var(--mono);font-size:.58rem;
+  font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+  padding:17px 22px;cursor:pointer;
+  transition:all .18s;text-decoration:none;
+}
+.btn-cta-secondary:hover{
+  border-color:var(--accent1);color:var(--accent1);
+}
+.btn-cta-secondary-sub{
+  font-size:.74rem;color:rgba(243,237,226,0.3);
+  margin-top:5px;line-height:1.5;
+}
+
+/* RIGHT */
+.stage-card{
+  border:1px solid var(--border-strong);
+  padding:2rem;margin-bottom:1.8rem;
+  position:relative;overflow:hidden;
+}
+.stage-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent1),var(--accent2),transparent);
+}
+.sc-label{
+  font-family:var(--mono);font-size:.46rem;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:.7rem;
+}
+.sc-name{
+  font-family:var(--serif);font-weight:900;
+  font-size:1.7rem;color:var(--secondary);
+  line-height:1.1;margin-bottom:.4rem;letter-spacing:-.02em;
+}
+.sc-ies{
+  font-family:var(--mono);font-size:.46rem;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent1);margin-bottom:1rem;display:block;
+}
+.sc-desc{
+  font-size:.81rem;line-height:1.8;
+  color:rgba(243,237,226,0.4);
+}
+.sc-quote{
+  font-family:var(--serif);font-size:.92rem;
+  font-style:italic;
+  color:rgba(243,237,226,0.5);
+  border-left:2px solid rgba(255,45,45,0.3);
+  padding-left:14px;line-height:1.55;margin-top:1rem;
+}
+/* IES BARS CARD */
+.ies-card{
+  border:1px solid var(--border);
+  padding:1.4rem 1.8rem;margin-bottom:1.8rem;
+}
+.ies-card-label{
+  font-family:var(--mono);font-size:.46rem;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:1rem;
+}
+.ies-row{margin-bottom:16px}
+.ies-row:last-child{margin-bottom:0}
+.ies-row-hd{
+  display:flex;justify-content:space-between;
+  align-items:baseline;margin-bottom:5px;
+}
+.ies-name{
+  font-family:var(--mono);font-size:.5rem;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(243,237,226,0.45);
+}
+.ies-score{
+  font-family:var(--mono);font-size:.62rem;color:var(--secondary);
+}
+.ies-score span{color:rgba(243,237,226,0.22)}
+.ies-interp{
+  font-size:.7rem;color:rgba(243,237,226,0.28);
+  font-style:italic;margin-top:2px;
+}
+.ies-track{height:2px;background:rgba(243,237,226,0.05)}
+.ies-fill{
+  height:100%;transition:width 1.2s ease;width:0%;
+  border-radius:1px;
+}
+.ies-fill.strong{background:var(--accent2)}
+.ies-fill.developing{background:rgba(182,255,46,0.4)}
+.ies-fill.weak{background:var(--accent1)}
+.results-footer{
+  padding:1.4rem 56px;
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:auto;
+}
+.restart-btn{
+  background:transparent;border:none;
+  color:rgba(243,237,226,0.18);
+  font-family:var(--mono);font-size:.5rem;
+  letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;transition:color .15s;
+}
+.restart-btn:hover{color:var(--secondary)}
+.results-note{
+  font-family:var(--mono);font-size:.46rem;
+  color:rgba(243,237,226,0.1);
+  letter-spacing:.1em;text-transform:uppercase;
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+@media(max-width:780px){
+  #screen-gate{flex-direction:column}
+  .gate-left{flex:0 0 auto;padding:2rem 1.5rem}
+  .gate-includes{display:none}
+  .gate-right{padding:2.5rem 1.5rem}
+  .results-grid{grid-template-columns:1fr;gap:2rem}
+  .cover-body,.quiz-body,.quiz-top,.quiz-nav,
+  .cover-nav,.cover-footer,.results-header,
+  .results-grid,.results-footer,.pt-wrap{
+    padding-left:1.5rem;padding-right:1.5rem;
+  }
+  .progress-track{width:100px}
+  .cover-headline{font-size:2.6rem}
+}
+</style>
+</head>
+<body>
+<div class="spine"></div>
+<div class="cover-line-v"></div>
+<div class="cover-line-v2"></div>
+
+<!-- ══ COVER ══ -->
+<div id="screen-cover" class="screen active">
+  <div class="cover-nav">
+    <span class="cover-brand">Brenda Blanche™ · The Unapologetics</span>
+    <span class="cover-tag">Free · 5 Minutes</span>
+  </div>
+  <div class="cover-body">
+    <div class="cover-eyebrow">The Market Perception Scorecard™</div>
+    <h1 class="cover-headline">
+      Discover what’s<br>
+      stopping the market<br>
+      from <em>choosing</em><br>
+      you <span class="red">today.</span>
+    </h1>
+    <div class="cover-rule"></div>
+    <p class="cover-sub">Expertise creates potential. Market perception determines whether that potential is recognized. This is a real diagnostic, not a quiz — 32 statements across the 8 dimensions that determine whether the market understands, trusts, remembers, and chooses you.</p>
+    <div class="cover-offer">
+      <span class="cover-offer-label">In this diagnostic you will discover</span>
+      <ul class="cover-offer-list">
+        <li>Your <strong>Market Perception Score™</strong> — one number, 0–100%, showing how strong the market's perception of your expertise actually is</li>
+        <li>Your full <strong>Perception Profile</strong> — a score across all 8 dimensions: Identity Clarity, Market Translation, Positioning, Category Strength, Narrative Architecture, Trust Architecture, Visibility System, and Memory & Recommendation</li>
+        <li>Your <strong>Perception Gap™</strong> — the distance between your actual expertise and how clearly the market currently perceives it</li>
+        <li>Your <strong>Primary Perception Gap</strong> — the single dimension costing you the most opportunity right now, and what to do about it first</li>
+      </ul>
+    </div>
+    <p class="cover-honest">Free. <span>·</span> Takes 8–10 minutes and the honesty to answer based on what the market actually perceives — not what you wish it perceived.</p>
+    <button class="btn-start" onclick="startQuiz()">
+      Start the Scorecard <span class="arr">→</span>
+    </button>
+  </div>
+  <div class="cover-footer">
+    <div class="cf-meta">32 statements <span>·</span> 8 dimensions</div>
+    <div class="cf-meta">5 perception levels</div>
+    <div class="cf-meta">Personalised report <span>·</span> sent to inbox</div>
+  </div>
+</div>
+
+<!-- ══ TRANSITION ══ -->
+<div id="screen-transition" class="screen">
+  <div class="pt-wrap">
+    <div class="pt-bg-num" id="pt-bg-num">1</div>
+    <div class="pt-eyebrow" id="pt-eyebrow">Section 1 of 8</div>
+    <div class="pt-bar"></div>
+    <h2 class="pt-heading" id="pt-heading"><span>Identity</span></h2>
+    <p class="pt-body" id="pt-body"></p>
+    <button class="btn-continue" onclick="continueToQuestions()">Continue <span>→</span></button>
+  </div>
+</div>
+
+<!-- ══ QUIZ ══ -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-top">
+    <div class="pillar-wrap">
+      <span class="pillar-name" id="pillar-display">Identity</span>
+      <span class="pillar-sub" id="pillar-sub">· Signal</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="q-counter" id="q-counter">1 of 32</div>
+    </div>
+  </div>
+  <div class="quiz-body">
+    <div class="q-num" id="q-num">Statement 01</div>
+    <p class="q-text" id="q-text"></p>
+    <div class="answer-grid" id="answer-grid"></div>
+  </div>
+  <div class="quiz-nav">
+    <button class="btn-back" id="btn-back" onclick="goBack()" disabled>← Back</button>
+    <button class="btn-next" id="btn-next" onclick="goNext()" disabled>Next →</button>
+  </div>
+</div>
+
+<!-- ══ GATE ══ -->
+<div id="screen-gate" class="screen">
+  <div class="gate-left">
+    <div class="gate-stripe"></div>
+    <div>
+      <div class="gate-brand">Brenda Blanche™ · The Unapologetics</div>
+      <div class="gate-eyebrow">Your diagnosis is ready</div>
+      <h2 class="gate-heading">One step to unlock your <em>full report.</em></h2>
+      <div class="gate-rule"></div>
+      <p class="gate-desc">Your Market Perception Score™, your full Perception Profile, and your Perception Gap™ are calculated and waiting.</p>
+    </div>
+    <div class="gate-includes">
+      <div class="gate-includes-label">Your report includes</div>
+      <div class="gate-inc-item"><span class="gate-inc-arr">→</span><span class="gate-inc-txt">Your exact score across all 8 dimensions of the Perception Profile</span></div>
+      <div class="gate-inc-item"><span class="gate-inc-arr">→</span><span class="gate-inc-txt">Your Perception Gap™ — expertise vs. how the market currently perceives you</span></div>
+      <div class="gate-inc-item"><span class="gate-inc-arr">→</span><span class="gate-inc-txt">Your Primary Perception Gap and what it is costing you</span></div>
+      <div class="gate-inc-item"><span class="gate-inc-arr">→</span><span class="gate-inc-txt">Your next Blueprint phase, built around your diagnosis</span></div>
+    </div>
+  </div>
+  <div class="gate-right">
+    <div class="gate-form-ey">One step away</div>
+    <h3 class="gate-form-title">Where should I send your <em>WhatsApp follow-up?</em></h3>
+    <p class="gate-form-sub">Your full report — scores, stage diagnosis, primary gap, and Blueprint phase — downloads instantly below.</p>
+    <div class="gate-error" id="gate-error">Please fill in both fields correctly.</div>
+    <div class="field-wrap">
+      <input type="text" id="gate-name" placeholder="name" autocomplete="given-name">
+      <label class="field-label" for="gate-name">First Name</label>
+      <div class="field-acc"></div>
+    </div>
+    <div class="field-wrap">
+      <input type="tel" id="gate-whatsapp" placeholder="whatsapp" autocomplete="tel">
+      <label class="field-label" for="gate-whatsapp">WhatsApp Number (with country code)</label>
+      <div class="field-acc"></div>
+    </div>
+    <button class="gate-submit" id="gate-submit" onclick="submitGate()">
+      <span style="display:flex;align-items:center;gap:12px">
+        Unlock My Report
+        <span class="gate-spinner" id="gate-spinner"></span>
+      </span>
+      <span>→</span>
+    </button>
+    <div class="gate-privacy">Your report downloads instantly. No spam, ever.</div>
+  </div>
+</div>
+
+<!-- ══ RESULTS ══ -->
+<div id="screen-results" class="screen">
+  <div class="results-header">
+    <div>
+      <div class="results-brand">Brenda Blanche™ · Market Perception Scorecard™</div>
+      <div style="font-family:var(--mono);font-size:.46rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.7rem">Your Market Perception Level</div>
+      <div class="stage-badge" id="stage-badge">—</div>
+    </div>
+    <div class="zone-wrap">
+      <span class="zone-label">Market Perception Score™</span>
+      <div class="zone-val" id="zone-val">—</div>
+    </div>
+  </div>
+  <div class="results-grid">
+    <div>
+      <div class="scores-eyebrow">Your Perception Profile</div>
+      <div id="scores-block"></div>
+      <div class="r-headline" id="r-headline"></div>
+      <p class="r-verdict" id="r-verdict"></p>
+      <div class="bottleneck-block" id="perception-gap-block" style="border-color:rgba(255,45,45,0.25)">
+        <div class="bottleneck-label">Your Perception Gap™</div>
+        <p class="bottleneck-body" id="gap-explainer">The distance between the expertise you actually have and how clearly the market currently perceives it.</p>
+        <div id="gap-numbers" style="display:flex;gap:28px;margin-top:14px;flex-wrap:wrap"></div>
+      </div>
+      <div class="bottleneck-block">
+        <div class="bottleneck-label">Your Primary Perception Gap</div>
+        <p class="bottleneck-body" id="bottleneck-body"></p>
+        <ul class="signals-list" id="signals-list"></ul>
+      </div>
+      <div class="moves-block">
+        <div class="moves-label">Your Next Blueprint Phase™</div>
+        <div class="r-headline" id="phase-name" style="font-size:1.15rem;margin-bottom:.6rem"></div>
+        <div class="bottleneck-body" id="phase-body" style="margin-bottom:1.2rem"></div>
+        <ul class="moves-list" id="moves-list"></ul>
+      </div>
+      <div class="results-ctas">
+        <div>
+          <div class="cta-eyebrow">Your personalised report is ready</div>
+          <button class="btn-cta-primary" id="btn-whatsapp-report" onclick="messageOnWhatsApp()" style="cursor:pointer">
+            <span>Message Me on WhatsApp to Get Your Report</span><span>→</span>
+          </button>
+          <p class="btn-cta-primary-sub">Your full diagnosis, Perception Profile, Perception Gap™, and Blueprint phase — sent to you personally on WhatsApp.</p>
+          <p style="margin-top:10px">
+            <a href="#" onclick="downloadReport();return false;" style="font-family:var(--mono);font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,237,226,0.25);text-decoration:underline;text-underline-offset:3px">
+              Prefer to download it yourself instead?
+            </a>
+          </p>
+        </div>
+        <div style="margin-top:6px">
+          <div class="cta-eyebrow">Want help closing this gap?</div>
+          <a class="btn-cta-secondary" href="https://calendly.com/unapologeticquenn/brand-clarity-call" target="_blank">
+            <span>Book a Free Clarity Call</span><span>→</span>
+          </a>
+          <p class="btn-cta-secondary-sub">For the people whose gap is painful enough that they don’t want to figure it out alone. 30 minutes. Free.</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="stage-card">
+        <div class="sc-label">Your Perception Level</div>
+        <div class="sc-name" id="sc-name"></div>
+        <span class="sc-ies" id="sc-ies"></span>
+        <p class="sc-desc" id="sc-desc"></p>
+        <p class="sc-quote" id="sc-quote"></p>
+      </div>
+      <div class="ies-card">
+        <div class="ies-card-label">Full Perception Profile</div>
+        <div id="ies-bars"></div>
+      </div>
+    </div>
+  </div>
+  <div class="results-footer">
+    <button class="restart-btn" onclick="restart()">← Retake Scorecard</button>
+    <div class="results-note">Market Perception Scorecard™ · Brenda Blanche™ · #UnapologeticallyYou</div>
+  </div>
+</div>
+
+<script>
+const CONFIG={
+  API_ENDPOINT:'/api/subscribe',
+  CLARITY_CALL:'https://calendly.com/unapologeticquenn/brand-clarity-call',
+  SUBSTACK:'https://brendablanche.substack.com',
+  // ⚠️ REPLACE THIS: Brenda's WhatsApp Business number, digits only, country code, no + or spaces.
+  // Example for Cameroon: '237600000000'
+  BRENDA_WHATSAPP:'REPLACE_WITH_YOUR_WHATSAPP_NUMBER'
+};
+
+const LIKERT=['Strongly Disagree','Disagree','Neutral / Unsure','Agree','Strongly Agree'];
+const EXPERTISE_OPTIONS=[
+  'Beginner — still learning the fundamentals',
+  'Competent — solid, but still developing',
+  'Skilled — very capable and dependable',
+  'Advanced — excellent, frequently sought after',
+  'Expert-level — elite, among the best in my field'
+];
+
+const questions=[
+  // ── SECTION 1 — IDENTITY CLARITY ──
+  {dimension:'Identity Clarity',sub:'· Signal',section:'Section 1 of 8',bgNum:'1',
+   intro:'These four statements measure your Identity Clarity — can the market clearly understand who you are? Answer based on what is currently true, not what you are working toward.',
+   text:'Someone unfamiliar with my work could describe what I do in one clear sentence.'},
+  {dimension:'Identity Clarity',sub:'· Signal',section:'Section 1 of 8',bgNum:'1',intro:'',
+   text:'My expertise is associated with one primary idea rather than many unrelated topics.'},
+  {dimension:'Identity Clarity',sub:'· Signal',section:'Section 1 of 8',bgNum:'1',intro:'',
+   text:'My experience, perspective, and strengths create a recognisable professional identity.'},
+  {dimension:'Identity Clarity',sub:'· Signal',section:'Section 1 of 8',bgNum:'1',intro:'',
+   text:'I consistently communicate the same identity across every platform.'},
+
+  // ── SECTION 2 — MARKET TRANSLATION ──
+  {dimension:'Market Translation',sub:'· Translation',section:'Section 2 of 8',bgNum:'2',
+   intro:'These four statements measure your Market Translation — can the market understand why your expertise actually matters? Rate based on how clearly your value translates into language your audience uses.',
+   text:'I explain my expertise in language my audience immediately understands.'},
+  {dimension:'Market Translation',sub:'· Translation',section:'Section 2 of 8',bgNum:'2',intro:'',
+   text:'I focus on the outcomes I create rather than simply describing my skills or services.'},
+  {dimension:'Market Translation',sub:'· Translation',section:'Section 2 of 8',bgNum:'2',intro:'',
+   text:'People quickly understand the problems I solve without needing additional explanation.'},
+  {dimension:'Market Translation',sub:'· Translation',section:'Section 2 of 8',bgNum:'2',intro:'',
+   text:'My messaging connects with both the practical and emotional needs of my audience.'},
+
+  // ── SECTION 3 — POSITIONING ──
+  {dimension:'Positioning',sub:'· Differentiation',section:'Section 3 of 8',bgNum:'3',
+   intro:'These four statements measure your Positioning — do people know why they should choose you specifically, not just that you are good?',
+   text:'I occupy a clear position that differentiates me from similar experts.'},
+  {dimension:'Positioning',sub:'· Differentiation',section:'Section 3 of 8',bgNum:'3',intro:'',
+   text:'My audience understands why I\u2019m different — not just that I\u2019m good.'},
+  {dimension:'Positioning',sub:'· Differentiation',section:'Section 3 of 8',bgNum:'3',intro:'',
+   text:'I am known for something specific rather than trying to appeal to everyone.'},
+  {dimension:'Positioning',sub:'· Differentiation',section:'Section 3 of 8',bgNum:'3',intro:'',
+   text:'My positioning makes comparisons with competitors less relevant.'},
+
+  // ── SECTION 4 — CATEGORY STRENGTH ──
+  {dimension:'Category Strength',sub:'· Category',section:'Section 4 of 8',bgNum:'4',
+   intro:'These four statements measure your Category Strength — are you competing inside your market, or changing how it thinks?',
+   text:'I describe my work using ideas or language that feel distinctive rather than generic.'},
+  {dimension:'Category Strength',sub:'· Category',section:'Section 4 of 8',bgNum:'4',intro:'',
+   text:'I challenge outdated assumptions within my industry instead of reinforcing them.'},
+  {dimension:'Category Strength',sub:'· Category',section:'Section 4 of 8',bgNum:'4',intro:'',
+   text:'My audience increasingly adopts the language or concepts I introduce.'},
+  {dimension:'Category Strength',sub:'· Category',section:'Section 4 of 8',bgNum:'4',intro:'',
+   text:'My work represents a clear point of view, not just another service.'},
+
+  // ── SECTION 5 — NARRATIVE ARCHITECTURE ──
+  {dimension:'Narrative Architecture',sub:'· Narrative',section:'Section 5 of 8',bgNum:'5',
+   intro:'These four statements measure your Narrative Architecture — can people easily explain what you do to someone else?',
+   text:'My message is simple enough that someone else could confidently explain it.'},
+  {dimension:'Narrative Architecture',sub:'· Narrative',section:'Section 5 of 8',bgNum:'5',intro:'',
+   text:'My communication consistently focuses on the customer\u2019s transformation rather than my credentials.'},
+  {dimension:'Narrative Architecture',sub:'· Narrative',section:'Section 5 of 8',bgNum:'5',intro:'',
+   text:'My content follows a clear narrative instead of disconnected ideas.'},
+  {dimension:'Narrative Architecture',sub:'· Narrative',section:'Section 5 of 8',bgNum:'5',intro:'',
+   text:'Every major communication reinforces the same central message.'},
+
+  // ── SECTION 6 — TRUST ARCHITECTURE ──
+  {dimension:'Trust Architecture',sub:'· Confidence',section:'Section 6 of 8',bgNum:'6',
+   intro:'These four statements measure your Trust Architecture — does the market believe you? This isn\u2019t about your actual credibility, it\u2019s about how confidently the market currently trusts what it sees.',
+   text:'My expertise is supported by visible proof rather than unsupported claims.'},
+  {dimension:'Trust Architecture',sub:'· Confidence',section:'Section 6 of 8',bgNum:'6',intro:'',
+   text:'Testimonials, case studies, or evidence reinforce my positioning.'},
+  {dimension:'Trust Architecture',sub:'· Confidence',section:'Section 6 of 8',bgNum:'6',intro:'',
+   text:'My online presence reduces uncertainty rather than creating more questions.'},
+  {dimension:'Trust Architecture',sub:'· Confidence',section:'Section 6 of 8',bgNum:'6',intro:'',
+   text:'Someone encountering my work for the first time would quickly perceive me as credible.'},
+
+  // ── SECTION 7 — VISIBILITY SYSTEM ──
+  {dimension:'Visibility System',sub:'· Consistency',section:'Section 7 of 8',bgNum:'7',
+   intro:'These four statements measure your Visibility System — can the market consistently encounter your ideas, or only when you\u2019re actively pushing?',
+   text:'My expertise appears consistently across the channels where my audience spends time.'},
+  {dimension:'Visibility System',sub:'· Consistency',section:'Section 7 of 8',bgNum:'7',intro:'',
+   text:'My content reinforces my positioning instead of diluting it.'},
+  {dimension:'Visibility System',sub:'· Consistency',section:'Section 7 of 8',bgNum:'7',intro:'',
+   text:'My visibility is driven by a repeatable system rather than bursts of activity.'},
+  {dimension:'Visibility System',sub:'· Consistency',section:'Section 7 of 8',bgNum:'7',intro:'',
+   text:'New people regularly discover my ideas without relying solely on referrals.'},
+
+  // ── SECTION 8 — MEMORY & RECOMMENDATION ──
+  {dimension:'Memory & Recommendation',sub:'· Recall',section:'Section 8 of 8',bgNum:'8',
+   intro:'These four statements measure Memory & Recommendation — will people remember you later, and confidently recommend you to someone else?',
+   text:'People associate me with a specific idea or expertise long after interacting with my content.'},
+  {dimension:'Memory & Recommendation',sub:'· Recall',section:'Section 8 of 8',bgNum:'8',intro:'',
+   text:'My work is memorable enough that people naturally refer others to me.'},
+  {dimension:'Memory & Recommendation',sub:'· Recall',section:'Section 8 of 8',bgNum:'8',intro:'',
+   text:'My audience can confidently explain what I do to someone else.'},
+  {dimension:'Memory & Recommendation',sub:'· Recall',section:'Section 8 of 8',bgNum:'8',intro:'',
+   text:'When people think about my area of expertise, I am one of the first experts who comes to mind.'},
+
+  // ── FINAL — EXPERTISE SELF-RATING (powers the Perception Gap™) ──
+  {dimension:'Actual Expertise',sub:'· Self-Assessment',section:'Final Step',bgNum:'E',isExpertise:true,
+   intro:'One last thing — and this one is about you, not the market. Rate your actual capability honestly. We\u2019ll compare it to how the market currently perceives you, and show you the gap between the two.',
+   text:'Honestly, how would you rate your actual capability and expertise in what you do?'}
+];
+
+const DIMENSIONS=['Identity Clarity','Market Translation','Positioning','Category Strength','Narrative Architecture','Trust Architecture','Visibility System','Memory & Recommendation'];
+
+const bands={
+  Invisible:{
+    min:0,max:20,badge:'INVISIBLE',scName:'Invisible',
+    scDesc:'The market currently has little to no perception of your expertise. Your capability may be real and substantial, but almost none of it is being translated into signals the market can actually recognise.',
+    scQuote:'“People don\u2019t really know what I do, even people who\u2019ve met me.”',
+    headline:'Your expertise exists. <em>The market doesn\u2019t know it yet.</em>',
+    verdict:'Right now there is a wide gap between what you are capable of and what the market perceives. This isn\u2019t a talent problem — it\u2019s the earliest stage of a perception problem, and it\u2019s the most common starting point for genuinely capable people who have never deliberately engineered how the market experiences their expertise.'
+  },
+  Recognizable:{
+    min:21,max:40,badge:'RECOGNIZABLE',scName:'Recognizable',
+    scDesc:'People notice you, but the perception is inconsistent. You are visible enough to be discovered, but not yet clearly enough understood, positioned, or trusted to convert that visibility into demand.',
+    scQuote:'“People see my content, but it doesn\u2019t really turn into anything.”',
+    headline:'You\u2019re on the radar. <em>You\u2019re not yet understood.</em>',
+    verdict:'You have crossed the first threshold — the market is at least aware you exist. But awareness without clarity creates weak perception: people notice you without forming a confident belief about what you actually do or why it matters to them.'
+  },
+  Credible:{
+    min:41,max:60,badge:'CREDIBLE',scName:'Credible',
+    scDesc:'You have real, established credibility with part of your market. But your positioning, communication, or visibility still create enough friction that perception isn\u2019t yet compounding into consistent demand.',
+    scQuote:'“People trust me once they know me — but that first step takes too long.”',
+    headline:'You\u2019re believed. <em>You\u2019re not yet the obvious choice.</em>',
+    verdict:'Credibility is a real asset — the market believes you when it encounters you clearly. The remaining work isn\u2019t about becoming more capable. It\u2019s about removing the friction between first encounter and confident recognition.'
+  },
+  Preferred:{
+    min:61,max:80,badge:'PREFERRED',scName:'Preferred',
+    scDesc:'The market increasingly understands and trusts you, and you\u2019re becoming a genuine go-to expert in a defined space. What remains is sharpening distinctiveness and increasing how reliably you\u2019re remembered and recommended.',
+    scQuote:'“People are starting to think of me first — just not consistently yet.”',
+    headline:'You\u2019re becoming <em>the reference point.</em>',
+    verdict:'This is a strong position. Preference is where positioning starts becoming commercially valuable — you are no longer just an option being compared, you are increasingly the standard others get compared against. The remaining gap is consistency, not capability.'
+  },
+  ObviousChoice:{
+    min:81,max:100,badge:'OBVIOUS CHOICE',scName:'Obvious Choice',
+    scDesc:'Your expertise is clearly understood, trusted, remembered, and confidently recommended. You occupy a strong, defined position inside your market\u2019s mind.',
+    scQuote:'“The right people already know who I am before we even speak.”',
+    headline:'Your reputation <em>works before you enter the room.</em>',
+    verdict:'You have achieved genuine Market Perception alignment. The market does not need convincing — it needs consistent encounters, because the recognition, trust, and memory already built will do the rest. The priority now is protecting this position while extending it deliberately.'
+  }
+};
+
+const gaps={
+  'Identity Clarity':{
+    phase:'Engineer Identity',
+    bottleneck:'Your weakest dimension is Identity Clarity. The market cannot yet describe, in one sentence, what you are specifically known for — and what cannot be described cannot be remembered, categorised, or chosen.',
+    phaseWhy:'Because Identity Clarity is your weakest dimension, your priority for the next 30 days is giving the market one sharp, repeatable answer to who you are.',
+    signals:['You find yourself explaining what you do differently depending on who\u2019s asking.','Your content moves across several unrelated topics instead of reinforcing one idea.','People who follow you would struggle to summarise your expertise in a single sentence.'],
+    moves:['Define the one primary idea you want to be known for, and remove everything that competes with it.','Write a single-sentence description of what you do and test it on five people who don\u2019t know your work.','Audit your last 15 pieces of content — how many reinforce that one identity, and how many dilute it?']
+  },
+  'Market Translation':{
+    phase:'Engineer Translation',
+    bottleneck:'Your weakest dimension is Market Translation. You may understand your own expertise fluently, but that understanding isn\u2019t yet translated into language your market immediately grasps — so the value you create stays invisible to the people who need it most.',
+    phaseWhy:'Because Market Translation is your weakest dimension, your priority for the next 30 days is closing the gap between how you think about your expertise and how your market actually talks about it.',
+    signals:['People need extra explanation before they understand the problem you actually solve.','Your messaging describes your skills and services more than the outcomes you create.','Your language leans on internal or industry jargon rather than your audience\u2019s own words.'],
+    moves:['Rewrite your core message around the outcome you create, not the process you use to create it.','Interview three past clients and steal their exact language for how they describe the problem you solved.','Test your one-sentence pitch on someone outside your industry — if they\u2019re confused, it isn\u2019t translated yet.']
+  },
+  'Positioning':{
+    phase:'Engineer Positioning',
+    bottleneck:'Your weakest dimension is Positioning. The market may recognise that you\u2019re good — but it doesn\u2019t yet know why you specifically, over the other capable people offering something similar.',
+    phaseWhy:'Because Positioning is your weakest dimension, your priority for the next 30 days is making comparison with competitors increasingly irrelevant.',
+    signals:['Prospects compare you directly against competitors instead of seeing you as the obvious fit.','You feel pressure to appeal broadly rather than owning one specific space.','Your differentiation lives in your head, not in anything the market can actually observe.'],
+    moves:['Identify the one thing you do differently that actually matters to your buyer, and make it the centre of your positioning.','Remove language that makes you sound interchangeable with other experts in your space.','State plainly who you are for and who you are not for — positioning requires exclusion.']
+  },
+  'Category Strength':{
+    phase:'Engineer Category',
+    bottleneck:'Your weakest dimension is Category Strength. You\u2019re currently competing inside an existing, crowded category rather than defining language or a point of view the market can associate only with you.',
+    phaseWhy:'Because Category Strength is your weakest dimension, your priority for the next 30 days is shifting from competing well to becoming genuinely incomparable.',
+    signals:['You describe your work the same way most others in your field describe theirs.','Your audience isn\u2019t picking up any language or ideas that are distinctly yours.','You tend to reinforce industry norms rather than challenge them.'],
+    moves:['Name one assumption in your industry you genuinely disagree with, and build a point of view around it.','Give your methodology or approach a name the market can adopt and repeat.','Say the thing your competitors are thinking but avoiding saying publicly.']
+  },
+  'Narrative Architecture':{
+    phase:'Engineer Narrative',
+    bottleneck:'Your weakest dimension is Narrative Architecture. Your ideas may be strong individually, but they aren\u2019t yet organised into a story simple enough for someone else to explain on your behalf.',
+    phaseWhy:'Because Narrative Architecture is your weakest dimension, your priority for the next 30 days is making your message simple enough that other people can confidently repeat it for you.',
+    signals:['Someone trying to describe your work to a colleague would struggle to do it accurately.','Your communication centres on your credentials more than the audience\u2019s transformation.','Your content reads as a series of disconnected ideas rather than one throughline.'],
+    moves:['Build one core narrative — problem, transformation, proof — and route every piece of content through it.','Rewrite your bio and pitch to centre the client\u2019s transformation, not your resume.','Ask a follower to explain what you do in their own words — wherever they struggle is where your narrative breaks.']
+  },
+  'Trust Architecture':{
+    phase:'Engineer Trust',
+    bottleneck:'Your weakest dimension is Trust Architecture. People may understand what you do, but they don\u2019t yet have enough visible, credible proof to reduce the uncertainty of actually choosing you.',
+    phaseWhy:'Because Trust Architecture is your weakest dimension, your priority for the next 30 days is converting whatever proof you already have into visible, believable confidence.',
+    signals:['Your claims about your expertise outweigh the visible evidence backing them.','Testimonials or case studies are thin, outdated, or not visible where prospects actually look.','Someone encountering you for the first time would have real, unanswered questions about your credibility.'],
+    moves:['Make your strongest, most specific proof visible and current — real results, not vague praise.','Reduce a specific source of uncertainty: your process, your guarantee, what happens after someone says yes.','Audit your first impression — profile, content, DMs — for anything that quietly raises doubt.']
+  },
+  'Visibility System':{
+    phase:'Engineer Visibility',
+    bottleneck:'Your weakest dimension is Visibility System. Your positioning and trust may be solid — but the market isn\u2019t encountering you often or predictably enough for that perception to compound.',
+    phaseWhy:'Because Visibility System is your weakest dimension, your priority for the next 30 days is making your existing perception compound instead of resetting every time you go quiet.',
+    signals:['Your visibility depends on bursts of motivation rather than a repeatable system.','When you stop posting or showing up, your inbound activity drops off quickly.','New people rarely discover you outside of direct referrals.'],
+    moves:['Build a content system that runs on a schedule, not on inspiration.','Diversify how new people find you beyond referrals — one new discovery channel is enough to start.','Make sure every piece of visibility reinforces the same position instead of introducing a new one each time.']
+  },
+  'Memory & Recommendation':{
+    phase:'Engineer Memory',
+    bottleneck:'Your weakest dimension is Memory & Recommendation. People may encounter and even trust you — but they aren\u2019t retaining a strong enough association to think of you first, or to confidently recommend you to someone else.',
+    phaseWhy:'Because Memory & Recommendation is your weakest dimension, your priority for the next 30 days is becoming the name that surfaces automatically when the right problem appears.',
+    signals:['People need reminding of what you do, even after previous interactions.','Referrals are rare, and when they happen, they require you to explain yourself again.','When your specific expertise is needed, you aren\u2019t the first name that comes to mind.'],
+    moves:['Anchor yourself to one specific problem so consistently that it becomes an automatic association.','Give people simple, repeatable language to describe you to someone else.','Stay visible enough, on the same theme, that recognition has room to compound into recall.']
+  }
+};
+
+function getBandKey(pct){
+  if(pct<=20)return'Invisible';
+  if(pct<=40)return'Recognizable';
+  if(pct<=60)return'Credible';
+  if(pct<=80)return'Preferred';
+  return'ObviousChoice';
+}
+function getGapDimension(dimScores){
+  let min=Infinity,gapDim=DIMENSIONS[0];
+  DIMENSIONS.forEach(d=>{if(dimScores[d]<min){min=dimScores[d];gapDim=d}});
+  return gapDim;
+}
+function scoreLabel(v){
+  const p=(v/20)*100;
+  if(p>=65)return{label:'Strong',cls:'strong'};
+  if(p>=40)return{label:'Developing',cls:'developing'};
+  return{label:'Weak',cls:'weak'};
+}
+
+let currentQ=0,answers=new Array(questions.length).fill(null),selectedVal=null,
+    userName='',userWhatsApp='',dimScores={},totalScore=0,pctScore=0,bandKey='',gapDim='',expertiseScore=0,perceptionGap=0;
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function startQuiz(){
+  currentQ=0;answers=new Array(questions.length).fill(null);
+  selectedVal=null;
+  showTransition(0);
+}
+function showTransition(idx){
+  const q=questions[idx];
+  document.getElementById('pt-eyebrow').textContent=q.section;
+  document.getElementById('pt-heading').innerHTML='<span>'+q.dimension+'</span>';
+  document.getElementById('pt-body').textContent=q.intro;
+  document.getElementById('pt-bg-num').textContent=q.bgNum;
+  showScreen('screen-transition');
+}
+function continueToQuestions(){loadQuestion(currentQ);showScreen('screen-quiz')}
+function loadQuestion(idx){
+  const q=questions[idx];
+  document.getElementById('pillar-display').textContent=q.dimension;
+  document.getElementById('pillar-sub').textContent=q.sub;
+  document.getElementById('q-num').textContent=q.isExpertise?'Final Step':'Statement '+String(idx+1).padStart(2,'0');
+  document.getElementById('q-text').textContent=q.text;
+  document.getElementById('q-counter').textContent=q.isExpertise?'Final step':(idx+1)+' of '+(questions.length-1);
+  document.getElementById('progress-fill').style.width=(idx/questions.length*100)+'%';
+  const grid=document.getElementById('answer-grid');
+  grid.innerHTML='';
+  const labels=q.isExpertise?EXPERTISE_OPTIONS:LIKERT;
+  labels.forEach((opt,i)=>{
+    const val=i+1;
+    const btn=document.createElement('button');
+    btn.className='answer-btn'+(answers[idx]===val?' selected':'');
+    btn.dataset.val=val;
+    btn.innerHTML='<div class="a-dot"></div><span class="a-label">'+opt+'</span>';
+    btn.onclick=()=>selectAnswer(val);
+    grid.appendChild(btn);
+  });
+  selectedVal=answers[idx];
+  document.getElementById('btn-next').disabled=(selectedVal===null);
+  document.getElementById('btn-back').disabled=(idx===0);
+}
+function selectAnswer(val){
+  selectedVal=val;answers[currentQ]=val;
+  document.querySelectorAll('.answer-btn').forEach(b=>{
+    b.classList.toggle('selected',parseInt(b.dataset.val)===val);
+  });
+  document.getElementById('btn-next').disabled=false;
+}
+function goBack(){if(currentQ===0)return;currentQ--;loadQuestion(currentQ)}
+function goNext(){
+  if(selectedVal===null)return;
+  const prev=currentQ;currentQ++;
+  if(currentQ>=questions.length){
+    computeScores();
+    showScreen('screen-gate');return;
+  }
+  const pd=questions[prev].dimension,nd=questions[currentQ].dimension;
+  if(nd!==pd&&questions[currentQ].intro)showTransition(currentQ);
+  else loadQuestion(currentQ);
+}
+function computeScores(){
+  dimScores={};
+  DIMENSIONS.forEach((dim,i)=>{
+    const start=i*4;
+    dimScores[dim]=answers.slice(start,start+4).reduce((a,b)=>a+(b||0),0);
+  });
+  totalScore=DIMENSIONS.reduce((sum,d)=>sum+dimScores[d],0);
+  pctScore=Math.round((totalScore/160)*100);
+  bandKey=getBandKey(pctScore);
+  gapDim=getGapDimension(dimScores);
+  const expertiseAnswer=answers[questions.length-1]||3;
+  expertiseScore=expertiseAnswer*20;
+  perceptionGap=expertiseScore-pctScore;
+}
+
+function buildReportText(){
+  const b=bands[bandKey];
+  const g=gaps[gapDim];
+  const lines=[
+    'MARKET PERCEPTION SCORECARD™ — PERSONALISED REPORT',
+    'Name: '+userName,
+    'Level: '+b.scName+' ('+pctScore+'%)',
+    '',
+    'PERCEPTION PROFILE',
+    ...DIMENSIONS.map(d=>d+': '+dimScores[d]+'/20'),
+    '',
+    'PERCEPTION GAP™',
+    'Self-Rated Expertise: '+expertiseScore+'%',
+    'Market Perception Score: '+pctScore+'%',
+    'Gap: '+perceptionGap+' points',
+    '',
+    stripHtml(b.headline),
+    b.verdict,
+    '',
+    'PRIMARY PERCEPTION GAP: '+gapDim,
+    g.bottleneck,
+    ...g.signals.map(s=>'→ '+s),
+    '',
+    'NEXT BLUEPRINT PHASE™ — '+g.phase,
+    g.phaseWhy,
+    ...g.moves.map((m,i)=>(i+1)+'. '+m)
+  ];
+  return lines.join('\n');
+}
+
+async function submitGate(){
+  const name=document.getElementById('gate-name').value.trim();
+  const whatsapp=document.getElementById('gate-whatsapp').value.trim();
+  const errEl=document.getElementById('gate-error');
+  const btn=document.getElementById('gate-submit');
+  const spin=document.getElementById('gate-spinner');
+  const ok=/^\+?[0-9\s\-]{7,16}$/.test(whatsapp);
+  if(!name||!ok){errEl.style.display='block';return}
+  errEl.style.display='none';
+  userName=name;userWhatsApp=whatsapp;
+  btn.disabled=true;spin.style.display='inline-block';
+  try{
+    await fetch(CONFIG.API_ENDPOINT,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        name,whatsapp,
+        band:bandKey,bandName:bands[bandKey].scName,
+        percentScore:pctScore,
+        gapDimension:gapDim,
+        expertiseScore,perceptionGap,
+        dimensionScores:dimScores,
+        reportText:buildReportText()
+      })
+    });
+  }catch(e){console.warn('Function error:',e)}
+  btn.disabled=false;spin.style.display='none';
+  showResults();
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.getElementById('screen-gate').classList.contains('active'))submitGate();
+});
+
+function messageOnWhatsApp(){
+  const b=bands[bandKey];
+  const num=CONFIG.BRENDA_WHATSAPP;
+  if(!num||num.indexOf('REPLACE')===0){
+    alert('WhatsApp number not configured yet — using the download link instead.');
+    downloadReport();
+    return;
+  }
+  const msg='Hi Brenda, I just completed the Market Perception Scorecard™. '
+    +'My name is '+userName+' and my level is '+b.scName+' ('+pctScore+'%). '
+    +'I\'d like my personalised report, please!';
+  window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg),'_blank');
+}
+function stripHtml(s){
+  const d=document.createElement('div');d.innerHTML=s;return d.textContent||d.innerText||'';
+}
+
+function downloadReport(){
+  const b=bands[bandKey];
+  const g=gaps[gapDim];
+  const { jsPDF }=window.jspdf;
+  const doc=new jsPDF({unit:'pt',format:'a4'});
+  const pageW=595.28,marginX=48;
+  let y=56;
+  const CREAM=[243,237,226],INK=[7,10,18],RED=[255,45,45],GREEN=[130,180,40],MUTED=[90,95,110];
+
+  function bg(){doc.setFillColor(...CREAM);doc.rect(0,0,pageW,841.89,'F')}
+  function checkPage(need){if(y+need>780){doc.addPage();bg();y=56}}
+  bg();
+
+  doc.setTextColor(...RED);doc.setFont('helvetica','bold');doc.setFontSize(8);
+  doc.text('BRENDA BLANCHE™  ·  THE UNAPOLOGETICS',marginX,y);y+=22;
+  doc.setTextColor(...INK);doc.setFont('helvetica','bold');doc.setFontSize(20);
+  doc.text('Market Perception Scorecard™',marginX,y);y+=18;
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(...MUTED);
+  doc.text('Personalised report for '+(userName||'you'),marginX,y);y+=28;
+
+  doc.setFillColor(...RED);doc.rect(marginX,y-14,doc.getTextWidth(b.badge)+28,22,'F');
+  doc.setTextColor(...CREAM);doc.setFont('helvetica','bold');doc.setFontSize(10);
+  doc.text(b.badge,marginX+14,y+1);
+  doc.setTextColor(...MUTED);doc.setFont('helvetica','normal');doc.setFontSize(9);
+  doc.text('Market Perception Score: '+pctScore+'%',marginX+doc.getTextWidth(b.badge)+50,y+1);
+  y+=38;
+
+  doc.setDrawColor(...MUTED);doc.setLineWidth(0.5);doc.line(marginX,y,pageW-marginX,y);y+=22;
+
+  doc.setTextColor(...INK);doc.setFont('helvetica','bold');doc.setFontSize(9);
+  doc.text('YOUR PERCEPTION PROFILE',marginX,y);y+=16;
+  DIMENSIONS.forEach(dim=>{
+    const score=dimScores[dim];const pct=score/20;const isGap=dim===gapDim;
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...INK);
+    doc.text(dim,marginX,y+7);
+    doc.text(score+'/20'+(isGap?'  ← primary gap':''),marginX+330,y+7);
+    doc.setFillColor(220,214,200);doc.rect(marginX+80,y,220,6,'F');
+    doc.setFillColor(...(isGap?RED:GREEN));
+    doc.rect(marginX+80,y,220*pct,6,'F');
+    y+=20;
+  });
+  y+=14;
+
+  checkPage(70);
+  doc.setDrawColor(...MUTED);doc.line(marginX,y,pageW-marginX,y);y+=20;
+  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...RED);
+  doc.text('YOUR PERCEPTION GAP™',marginX,y);y+=16;
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(60,64,74);
+  doc.text('Self-Rated Expertise: '+expertiseScore+'%   |   Market Perception Score: '+pctScore+'%   |   Gap: '+perceptionGap+' points',marginX,y);
+  y+=24;
+
+  checkPage(60);
+  doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(...INK);
+  const headlineLines=doc.splitTextToSize(stripHtml(b.headline),pageW-marginX*2);
+  doc.text(headlineLines,marginX,y);y+=headlineLines.length*16+10;
+
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(60,64,74);
+  const verdictLines=doc.splitTextToSize(b.verdict,pageW-marginX*2);
+  doc.text(verdictLines,marginX,y);y+=verdictLines.length*13+18;
+
+  checkPage(80);
+  doc.setDrawColor(...MUTED);doc.line(marginX,y,pageW-marginX,y);y+=20;
+  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...RED);
+  doc.text('YOUR PRIMARY PERCEPTION GAP — '+gapDim.toUpperCase(),marginX,y);y+=16;
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(60,64,74);
+  const bnLines=doc.splitTextToSize(g.bottleneck,pageW-marginX*2);
+  doc.text(bnLines,marginX,y);y+=bnLines.length*13+10;
+  g.signals.forEach(s=>{
+    checkPage(30);
+    const lines=doc.splitTextToSize('→ '+s,pageW-marginX*2-10);
+    doc.text(lines,marginX+4,y);y+=lines.length*13+4;
+  });
+  y+=14;
+
+  checkPage(100);
+  doc.setDrawColor(...MUTED);doc.line(marginX,y,pageW-marginX,y);y+=20;
+  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...INK);
+  doc.text('YOUR NEXT BLUEPRINT PHASE™  —  '+g.phase,marginX,y);y+=16;
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(60,64,74);
+  const phaseLines=doc.splitTextToSize(g.phaseWhy,pageW-marginX*2);
+  doc.text(phaseLines,marginX,y);y+=phaseLines.length*13+10;
+  g.moves.forEach((m,i)=>{
+    checkPage(30);
+    const lines=doc.splitTextToSize((i+1)+'. '+m,pageW-marginX*2-10);
+    doc.text(lines,marginX+4,y);y+=lines.length*13+6;
+  });
+
+  checkPage(60);
+  y+=16;doc.setDrawColor(...MUTED);doc.line(marginX,y,pageW-marginX,y);y+=20;
+  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...RED);
+  doc.text('Want help closing this gap?',marginX,y);y+=14;
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(...INK);
+  doc.text('Book a free Clarity Call: https://calendly.com/unapologeticquenn/brand-clarity-call',marginX,y);y+=24;
+  doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(...MUTED);
+  doc.text('Market Perception Scorecard™ · Brenda Blanche™ · #UnapologeticallyYou',marginX,y);
+
+  const fileName='Market-Perception-Report-'+(userName||'Report').replace(/[^a-z0-9]/gi,'-')+'.pdf';
+  doc.save(fileName);
+}
+
+function showResults(){
+  const b=bands[bandKey];
+  const g=gaps[gapDim];
+  document.getElementById('stage-badge').textContent=b.badge;
+  document.getElementById('zone-val').textContent=pctScore+'%';
+  document.getElementById('r-headline').innerHTML=b.headline;
+  document.getElementById('r-verdict').textContent=b.verdict;
+  document.getElementById('bottleneck-body').textContent=g.bottleneck;
+  document.getElementById('sc-name').textContent=b.scName;
+  document.getElementById('sc-desc').textContent=b.scDesc;
+  document.getElementById('sc-quote').textContent=b.scQuote;
+  document.getElementById('sc-ies').textContent='Strongest: '+DIMENSIONS.reduce((a,d)=>dimScores[d]>dimScores[a]?d:a)+'  ·  Weakest: '+gapDim;
+  document.getElementById('phase-name').textContent='Current Phase — '+g.phase;
+  document.getElementById('phase-body').textContent=g.phaseWhy;
+
+  const gapWords=perceptionGap>=0
+    ? 'The market currently perceives you '+Math.abs(perceptionGap)+' points below your actual capability.'
+    : 'Interesting — the market currently perceives you slightly higher than your own self-rating. Worth reflecting on why.';
+  document.getElementById('gap-explainer').textContent='The distance between the expertise you actually have and how clearly the market currently perceives it. '+gapWords;
+  const gapNumsEl=document.getElementById('gap-numbers');
+  gapNumsEl.innerHTML=`
+    <div><div style="font-family:var(--mono);font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Your Expertise</div><div style="font-family:var(--serif);font-size:1.8rem;color:var(--secondary)">${expertiseScore}%</div></div>
+    <div><div style="font-family:var(--mono);font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Market Perception</div><div style="font-family:var(--serif);font-size:1.8rem;color:var(--secondary)">${pctScore}%</div></div>
+    <div><div style="font-family:var(--mono);font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent1)">Perception Gap</div><div style="font-family:var(--serif);font-size:1.8rem;color:var(--accent1)">${perceptionGap>=0?perceptionGap:0}</div></div>
+  `;
+
+  const sl=document.getElementById('signals-list');
+  sl.innerHTML='';
+  g.signals.forEach(s=>{const li=document.createElement('li');li.textContent=s;sl.appendChild(li)});
+  const ml=document.getElementById('moves-list');
+  ml.innerHTML='';
+  g.moves.forEach((m,i)=>{
+    const li=document.createElement('li');
+    li.innerHTML='<span class="move-num">0'+(i+1)+'</span><span>'+m+'</span>';
+    ml.appendChild(li);
+  });
+
+  const sb=document.getElementById('scores-block');
+  sb.innerHTML='';
+  DIMENSIONS.forEach(dim=>{
+    const score=dimScores[dim];const pct=(score/20*100).toFixed(0);const isGap=dim===gapDim;
+    const row=document.createElement('div');
+    row.className='score-row'+(isGap?' gap':'');
+    row.innerHTML=`
+      <div class="score-name">${dim}</div>
+      <div class="score-track"><div class="score-fill" data-pct="${pct}" style="width:0%"></div></div>
+      <div class="score-val">${score}<span>/20</span></div>
+      ${isGap?'<div class="gap-tag" id="gap-tag">← primary gap</div>':''}
+    `;
+    sb.appendChild(row);
+  });
+
+  const ib=document.getElementById('ies-bars');
+  ib.innerHTML='';
+  DIMENSIONS.forEach(dim=>{
+    const score=dimScores[dim];const pct=(score/20*100).toFixed(0);const interp=scoreLabel(score);
+    const div=document.createElement('div');
+    div.className='ies-row';
+    div.innerHTML=`
+      <div class="ies-row-hd">
+        <span class="ies-name">${dim}</span>
+        <span class="ies-score">${score}<span>/20</span></span>
+      </div>
+      <div class="ies-interp">${interp.label}</div>
+      <div class="ies-track">
+        <div class="ies-fill ${interp.cls}" data-pct="${pct}" style="width:0%"></div>
+      </div>
+    `;
+    ib.appendChild(div);
+  });
+
+  showScreen('screen-results');
+  setTimeout(()=>{
+    document.querySelectorAll('.score-fill,.ies-fill').forEach(el=>{
+      el.style.transition='width 1.1s ease';
+      el.style.width=el.dataset.pct+'%';
+    });
+    const gt=document.getElementById('gap-tag');
+    if(gt)setTimeout(()=>gt.classList.add('show'),950);
+  },150);
+}
+
+function restart(){
+  currentQ=0;answers=new Array(questions.length).fill(null);
+  selectedVal=null;userName='';userWhatsApp='';dimScores={};totalScore=0;pctScore=0;bandKey='';gapDim='';expertiseScore=0;perceptionGap=0;
+  document.getElementById('gate-name').value='';
+  document.getElementById('gate-whatsapp').value='';
+  document.getElementById('gate-error').style.display='none';
+  showScreen('screen-cover');
+}
+</script>
+</body>
+</html>
