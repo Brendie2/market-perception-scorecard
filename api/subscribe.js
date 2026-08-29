@@ -1,74 +1,52 @@
 // api/subscribe.js
 //
 // VERCEL SERVERLESS FUNCTION — place this file at exactly: api/subscribe.js
-// (Vercel auto-detects anything in an /api folder as a live endpoint.
-//  This one will be reachable at: https://yoursite.vercel.app/api/subscribe,
-//  matching what the scorecard already calls — no HTML changes needed)
 //
-// Fires on every Market Perception Scorecard™ submission (right after someone
-// finishes all 32 statements + the expertise self-rating, and enters their
-// name + WhatsApp — before they see results).
+// ⚠️ BREAKING CHANGE FROM YOUR PREVIOUS VERSION ⚠️
+// The Scorecard now uses Brenda's official 5-stage Market Perception model:
+// Market Perception → Market Association → Market Trust → Market Recognition
+// → Market Choice. This replaces the previous 5 dimensions (Market Clarity,
+// Differentiation, Credibility, Recognition, Market Choice). Your Airtable
+// table needs its columns updated — see schema below. Existing records are
+// unaffected, but new submissions write to different column names.
 //
-// Does two things:
-//  1. Sends Brenda an instant email with the lead's full personalised report,
-//     so she can copy-paste it straight into WhatsApp when they message her.
-//  2. Creates a record in an Airtable base functioning as a lightweight CRM,
-//     so every scorecard lead is tracked with a status you can move through
-//     a pipeline (New Lead → Messaged → Converted → Not Interested).
+// Fires on every Market Perception Scorecard™ submission (right after
+// someone finishes all 25 questions + the expertise self-rating, and enters
+// their name, email, and WhatsApp — before they see results).
 //
-// ── SETUP (one-time) ──────────────────────────────────────────────
+// Does three things, in parallel:
+//  1. Emails the LEAD their own full personalised report, instantly.
+//  2. Emails BRENDA a notification with the lead's contact info and report.
+//  3. Writes a record to Airtable, the CRM.
 //
-// PROJECT STRUCTURE:
-//   your-project/
-//     index.html          ← the scorecard file (rename from
-//                           market-perception-scorecard.html to index.html)
-//     api/
-//       subscribe.js       ← this file
+// ── UPDATED AIRTABLE SCHEMA ──────────────────────────────────────
+//      Name                  — Single line text
+//      Email                 — Single line text
+//      WhatsApp              — Single line text
+//      Band                  — Single line text
+//      Percent Score         — Number
+//      Bottleneck Stage      — Single line text
+//      Strongest Stage       — Single line text
+//      Expertise Score       — Number
+//      Perception Gap        — Number
+//      Market Perception     — Number   (0-100, this stage's %)
+//      Market Association    — Number
+//      Market Trust          — Number
+//      Market Recognition    — Number
+//      Market Choice         — Number
+//      Report                — Long text
+//      Status                — Single select: New Lead, Messaged, Converted, Not Interested
+//      Submitted At           — Date (include time)
 //
-// EMAIL (Resend — free up to 3,000/month, no card needed):
-// 1. Sign up at https://resend.com and verify a sending domain.
-// 2. Grab your API key from the dashboard.
+// ── ENV VARS (unchanged) ─────────────────────────────────────────
+//      RESEND_API_KEY, NOTIFY_EMAIL, FROM_EMAIL,
+//      AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_TABLE_NAME
 //
-// CRM (Airtable — free tier is plenty for this):
-// 1. Create a base, add a table named exactly: Scorecard Leads
-// 2. Add these fields (names must match exactly):
-//      Name                        — Single line text
-//      WhatsApp                    — Single line text
-//      Band                        — Single line text (e.g. "Preferred")
-//      Percent Score               — Number
-//      Gap Dimension               — Single line text (the weakest of the 8)
-//      Expertise Score             — Number
-//      Perception Gap              — Number
-//      Identity Clarity            — Number
-//      Market Translation          — Number
-//      Positioning                 — Number
-//      Category Strength           — Number
-//      Narrative Architecture      — Number
-//      Trust Architecture          — Number
-//      Visibility System           — Number
-//      Memory Recommendation       — Number
-//      Report                      — Long text
-//      Status                      — Single select: New Lead, Messaged, Converted, Not Interested
-//      Submitted At                 — Date (include time)
-// 3. Base ID from https://airtable.com/api (starts with "app...")
-// 4. Personal Access Token from https://airtable.com/create/tokens
-//    with scopes: data.records:write, data.records:read, access to your base
-//
-// VERCEL ENV VARS (Project → Settings → Environment Variables):
-//      RESEND_API_KEY
-//      NOTIFY_EMAIL          — your inbox, e.g. brenda@theunapologetics.com
-//      FROM_EMAIL            — a verified Resend sender, e.g. scorecard@theunapologetics.com
-//      AIRTABLE_API_KEY      — your Personal Access Token
-//      AIRTABLE_BASE_ID      — starts with "app..."
-//      AIRTABLE_TABLE_NAME   — "Scorecard Leads" (or whatever you named it)
-//
-// No changes needed to the scorecard HTML — CONFIG.API_ENDPOINT already
-// points at '/api/subscribe', which is exactly where this file lives.
-//
-// The scorecard POSTs here with: { name, whatsapp, band, bandName,
-// percentScore, gapDimension, expertiseScore, perceptionGap,
-// dimensionScores, reportText } where dimensionScores is an object like:
-// { "Identity Clarity": 16, "Market Translation": 14, ... }
+// The scorecard POSTs here with: { name, email, whatsapp, band, bandName,
+// percentScore, bottleneckStage, strongestStage, expertiseScore,
+// perceptionGap, stageScores, reportText } where stageScores is:
+// { "Market Perception": 80, "Market Association": 80, "Market Trust": 80,
+//   "Market Recognition": 40, "Market Choice": 80 }  — each already 0-100.
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -78,54 +56,99 @@ export default async function handler(req, res) {
 
   const {
     name = 'Unknown',
+    email = '',
     whatsapp = 'Not provided',
-    band = 'Unknown',
-    bandName = band,
+    bandName = 'Unknown',
     percentScore = 0,
-    gapDimension = 'Unknown',
+    bottleneckStage = 'Unknown',
+    strongestStage = 'Unknown',
     expertiseScore = 0,
     perceptionGap = 0,
-    dimensionScores = {},
+    stageScores = {},
     reportText = ''
   } = req.body || {};
 
   const cleanNumber = whatsapp.replace(/[^\d+]/g, '');
   const waLink = cleanNumber ? `https://wa.me/${cleanNumber.replace('+', '')}` : null;
 
-  // ── 1. Email notification with full report ──────────────────────
   const reportHtml = reportText
     .split('\n')
     .map((line) => line || '&nbsp;')
     .join('<br>');
 
-  const dimensionRows = Object.entries(dimensionScores)
-    .map(([dim, score]) => `<tr><td style="color:#6E6570">${dim}</td><td>${score}/20${dim === gapDimension ? ' ← primary gap' : ''}</td></tr>`)
+  // ── Email 1: to the LEAD — their own report ──────────────────────
+  const leadEmailHtml = `
+    <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0F0C0D">
+      <p style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#C49A3C;margin-bottom:4px">
+        Market Perception Scorecard™
+      </p>
+      <h2 style="margin:0 0 16px">Hi ${name}, here's your full diagnosis</h2>
+      <p style="font-size:14px;line-height:1.6;color:#333">
+        Thanks for taking the Market Perception Scorecard™. Your complete results are below —
+        save this email, or reach out on WhatsApp any time if you want to talk through what to do next.
+      </p>
+      <div style="background:#F5EFE6;padding:16px;font-size:13px;line-height:1.6;white-space:pre-wrap;margin-top:16px">${reportHtml}</div>
+      <p style="margin-top:24px">
+        <a href="https://calendly.com/unapologeticquenn/brand-clarity-call" style="background:#E4007C;color:#fff;padding:12px 20px;text-decoration:none;border-radius:2px;display:inline-block;font-size:13px">Book a Free Clarity Call →</a>
+      </p>
+      <p style="font-size:11px;color:#999;margin-top:24px">Market Perception Scorecard™ · Brenda Blanche™ · #UnapologeticallyYou</p>
+    </div>
+  `;
+
+  const leadEmailPromise = email
+    ? fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: process.env.FROM_EMAIL,
+          to: email,
+          subject: `Your Market Perception Diagnosis — ${bandName} (${percentScore}%)`,
+          html: leadEmailHtml
+        })
+      }).then(async (r) => {
+        if (!r.ok) console.error('Resend error (lead email):', await r.text());
+      }).catch((err) => console.error('Lead email send failed:', err))
+    : Promise.resolve();
+
+  // ── Email 2: to BRENDA — notification with lead's info + report ─
+  const stageRows = Object.entries(stageScores)
+    .map(([stage, pct]) => {
+      let tag = '';
+      if (stage === bottleneckStage) tag = ' ← bottleneck';
+      if (stage === strongestStage) tag = ' ← what\u2019s working';
+      return `<tr><td style="color:#6E6570">${stage}</td><td>${pct}%${tag}</td></tr>`;
+    })
     .join('');
 
-  const emailHtml = `
+  const notifyEmailHtml = `
     <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0F0C0D">
       <p style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#C49A3C;margin-bottom:4px">
         New Scorecard Completion
       </p>
       <h2 style="margin:0 0 16px">${name} just finished the Market Perception Scorecard™</h2>
       <table cellpadding="6" style="border-collapse:collapse;font-size:14px;width:100%;margin-bottom:16px">
+        <tr><td style="color:#6E6570">Email</td><td><strong>${email}</strong></td></tr>
         <tr><td style="color:#6E6570">WhatsApp</td><td><strong>${whatsapp}</strong></td></tr>
         <tr><td style="color:#6E6570">Level</td><td><strong>${bandName} (${percentScore}%)</strong></td></tr>
-        <tr><td style="color:#6E6570">Primary Gap</td><td>${gapDimension}</td></tr>
+        <tr><td style="color:#6E6570">Bottleneck</td><td>${bottleneckStage}</td></tr>
+        <tr><td style="color:#6E6570">What's Working</td><td>${strongestStage}</td></tr>
         <tr><td style="color:#6E6570">Self-Rated Expertise</td><td>${expertiseScore}%</td></tr>
         <tr><td style="color:#6E6570">Perception Gap</td><td>${perceptionGap} points</td></tr>
-        ${dimensionRows}
+        ${stageRows}
       </table>
-      ${waLink ? `<p><a href="${waLink}" style="background:#D90429;color:#fff;padding:12px 20px;text-decoration:none;border-radius:2px;display:inline-block;font-size:13px">Message ${name} on WhatsApp →</a></p>` : ''}
+      ${waLink ? `<p><a href="${waLink}" style="background:#E4007C;color:#fff;padding:12px 20px;text-decoration:none;border-radius:2px;display:inline-block;font-size:13px">Message ${name} on WhatsApp →</a></p>` : ''}
       <hr style="border:none;border-top:1px solid #eee;margin:20px 0">
       <p style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#C49A3C;margin-bottom:8px">
-        Full Report — copy/paste into WhatsApp
+        Full Report (already sent to them)
       </p>
       <div style="background:#F5EFE6;padding:16px;font-size:13px;line-height:1.6;white-space:pre-wrap">${reportHtml}</div>
     </div>
   `;
 
-  const emailPromise = fetch('https://api.resend.com/emails', {
+  const notifyEmailPromise = fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
@@ -135,13 +158,13 @@ export default async function handler(req, res) {
       from: process.env.FROM_EMAIL,
       to: process.env.NOTIFY_EMAIL,
       subject: `🔔 ${name} just completed the Scorecard — ${bandName} (${percentScore}%)`,
-      html: emailHtml
+      html: notifyEmailHtml
     })
   }).then(async (r) => {
-    if (!r.ok) console.error('Resend error:', await r.text());
-  }).catch((err) => console.error('Email send failed:', err));
+    if (!r.ok) console.error('Resend error (notify email):', await r.text());
+  }).catch((err) => console.error('Notify email send failed:', err));
 
-  // ── 2. Airtable CRM record ───────────────────────────────────────
+  // ── Airtable CRM record ───────────────────────────────────────────
   const tableName = encodeURIComponent(process.env.AIRTABLE_TABLE_NAME || 'Scorecard Leads');
   const airtablePromise = fetch(
     `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${tableName}`,
@@ -154,20 +177,19 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         fields: {
           'Name': name,
+          'Email': email,
           'WhatsApp': whatsapp,
           'Band': bandName,
           'Percent Score': percentScore,
-          'Gap Dimension': gapDimension,
+          'Bottleneck Stage': bottleneckStage,
+          'Strongest Stage': strongestStage,
           'Expertise Score': expertiseScore,
           'Perception Gap': perceptionGap,
-          'Identity Clarity': dimensionScores['Identity Clarity'] || 0,
-          'Market Translation': dimensionScores['Market Translation'] || 0,
-          'Positioning': dimensionScores['Positioning'] || 0,
-          'Category Strength': dimensionScores['Category Strength'] || 0,
-          'Narrative Architecture': dimensionScores['Narrative Architecture'] || 0,
-          'Trust Architecture': dimensionScores['Trust Architecture'] || 0,
-          'Visibility System': dimensionScores['Visibility System'] || 0,
-          'Memory Recommendation': dimensionScores['Memory & Recommendation'] || 0,
+          'Market Perception': stageScores['Market Perception'] || 0,
+          'Market Association': stageScores['Market Association'] || 0,
+          'Market Trust': stageScores['Market Trust'] || 0,
+          'Market Recognition': stageScores['Market Recognition'] || 0,
+          'Market Choice': stageScores['Market Choice'] || 0,
           'Report': reportText,
           'Status': 'New Lead',
           'Submitted At': new Date().toISOString()
@@ -178,7 +200,7 @@ export default async function handler(req, res) {
     if (!r.ok) console.error('Airtable error:', await r.text());
   }).catch((err) => console.error('Airtable write failed:', err));
 
-  await Promise.allSettled([emailPromise, airtablePromise]);
+  await Promise.allSettled([leadEmailPromise, notifyEmailPromise, airtablePromise]);
 
   return res.status(200).json({ ok: true });
 }
