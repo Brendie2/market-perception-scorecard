@@ -1,14 +1,9 @@
-// api/subscribe.js
+// functions/api/subscribe.js
 //
-// VERCEL SERVERLESS FUNCTION — place this file at exactly: api/subscribe.js
-//
-// ⚠️ BREAKING CHANGE FROM YOUR PREVIOUS VERSION ⚠️
-// The Scorecard now uses Brenda's official 5-stage Market Perception model:
-// Market Perception → Market Association → Market Trust → Market Recognition
-// → Market Choice. This replaces the previous 5 dimensions (Market Clarity,
-// Differentiation, Credibility, Recognition, Market Choice). Your Airtable
-// table needs its columns updated — see schema below. Existing records are
-// unaffected, but new submissions write to different column names.
+// CLOUDFLARE PAGES FUNCTION — place this file at exactly: functions/api/subscribe.js
+// (Cloudflare Pages auto-routes files in /functions by their path — this file
+//  will be reachable at: https://yoursite.com/api/subscribe, matching what
+//  the scorecard already calls — no HTML changes needed)
 //
 // Fires on every Market Perception Scorecard™ submission (right after
 // someone finishes all 25 questions + the expertise self-rating, and enters
@@ -19,7 +14,14 @@
 //  2. Emails BRENDA a notification with the lead's contact info and report.
 //  3. Writes a record to Airtable, the CRM.
 //
-// ── UPDATED AIRTABLE SCHEMA ──────────────────────────────────────
+// ── PROJECT STRUCTURE ─────────────────────────────────────────────
+//   your-project/
+//     index.html                 ← the scorecard file
+//     functions/
+//       api/
+//         subscribe.js           ← this file
+//
+// ── AIRTABLE SCHEMA ("Scorecard Leads" table) ────────────────────
 //      Name                  — Single line text
 //      Email                 — Single line text
 //      WhatsApp              — Single line text
@@ -29,7 +31,7 @@
 //      Strongest Stage       — Single line text
 //      Expertise Score       — Number
 //      Perception Gap        — Number
-//      Market Perception     — Number   (0-100, this stage's %)
+//      Market Perception     — Number
 //      Market Association    — Number
 //      Market Trust          — Number
 //      Market Recognition    — Number
@@ -38,9 +40,14 @@
 //      Status                — Single select: New Lead, Messaged, Converted, Not Interested
 //      Submitted At           — Date (include time)
 //
-// ── ENV VARS (unchanged) ─────────────────────────────────────────
-//      RESEND_API_KEY, NOTIFY_EMAIL, FROM_EMAIL,
-//      AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_TABLE_NAME
+// ── CLOUDFLARE PAGES ENV VARS ────────────────────────────────────
+// (Cloudflare dashboard → your Pages project → Settings → Environment variables)
+//      RESEND_API_KEY
+//      NOTIFY_EMAIL          — your inbox, e.g. brenda@brendablanche.site
+//      FROM_EMAIL            — verified sender, e.g. reports@brendablanche.site
+//      AIRTABLE_API_KEY
+//      AIRTABLE_BASE_ID
+//      AIRTABLE_TABLE_NAME   — "Scorecard Leads"
 //
 // The scorecard POSTs here with: { name, email, whatsapp, band, bandName,
 // percentScore, bottleneckStage, strongestStage, expertiseScore,
@@ -48,10 +55,17 @@
 // { "Market Perception": 80, "Market Association": 80, "Market Trust": 80,
 //   "Market Recognition": 40, "Market Choice": 80 }  — each already 0-100.
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
-    return res.status(405).json({ error: 'Method Not Allowed' });
+export async function onRequestPost(context) {
+  const { request, env } = context;
+
+  let data;
+  try {
+    data = await request.json();
+  } catch (e) {
+    return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   const {
@@ -66,7 +80,7 @@ export default async function handler(req, res) {
     perceptionGap = 0,
     stageScores = {},
     reportText = ''
-  } = req.body || {};
+  } = data;
 
   const cleanNumber = whatsapp.replace(/[^\d+]/g, '');
   const waLink = cleanNumber ? `https://wa.me/${cleanNumber.replace('+', '')}` : null;
@@ -99,11 +113,11 @@ export default async function handler(req, res) {
     ? fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: process.env.FROM_EMAIL,
+          from: env.FROM_EMAIL,
           to: email,
           subject: `Your Market Perception Diagnosis — ${bandName} (${percentScore}%)`,
           html: leadEmailHtml
@@ -151,12 +165,12 @@ export default async function handler(req, res) {
   const notifyEmailPromise = fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+      'Authorization': `Bearer ${env.RESEND_API_KEY}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      from: process.env.FROM_EMAIL,
-      to: process.env.NOTIFY_EMAIL,
+      from: env.FROM_EMAIL,
+      to: env.NOTIFY_EMAIL,
       subject: `🔔 ${name} just completed the Scorecard — ${bandName} (${percentScore}%)`,
       html: notifyEmailHtml
     })
@@ -165,13 +179,13 @@ export default async function handler(req, res) {
   }).catch((err) => console.error('Notify email send failed:', err));
 
   // ── Airtable CRM record ───────────────────────────────────────────
-  const tableName = encodeURIComponent(process.env.AIRTABLE_TABLE_NAME || 'Scorecard Leads');
+  const tableName = encodeURIComponent(env.AIRTABLE_TABLE_NAME || 'Scorecard Leads');
   const airtablePromise = fetch(
-    `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${tableName}`,
+    `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${tableName}`,
     {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
+        'Authorization': `Bearer ${env.AIRTABLE_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -202,5 +216,8 @@ export default async function handler(req, res) {
 
   await Promise.allSettled([leadEmailPromise, notifyEmailPromise, airtablePromise]);
 
-  return res.status(200).json({ ok: true });
+  return new Response(JSON.stringify({ ok: true }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' }
+  });
 }
