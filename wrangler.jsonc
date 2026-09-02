@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "market-perception-scorecard",
+  "compatibility_date": "2026-08-28",
+  "main": "_worker.js",
+  "assets": {
+    "directory": "./",
+    "binding": "ASSETS"
+  }
+}
